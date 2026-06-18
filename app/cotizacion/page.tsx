@@ -1,4 +1,5 @@
 import { QuoteCart } from "@/components/QuoteCart";
+import { LocalizedText } from "@/components/LocalizedText";
 
 export const metadata = {
   title: "Cotización | Tessa Shop",
@@ -9,9 +10,9 @@ export default function QuotePage() {
   return (
     <>
       <section className="page-hero compact">
-        <p className="eyebrow">Solicitud de pedido</p>
-        <h1>Revisa productos y envía una cotización comercial.</h1>
-        <p>Este flujo está diseñado para confirmar disponibilidad, precio asignado y logística antes del pedido final.</p>
+        <LocalizedText as="p" textKey="quoteEyebrow" className="eyebrow" />
+        <LocalizedText as="h1" textKey="quoteTitle" />
+        <LocalizedText as="p" textKey="quoteBody" />
       </section>
       <QuoteCart />
     </>

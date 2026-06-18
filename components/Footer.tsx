@@ -1,16 +1,21 @@
+"use client";
+
 import Link from "next/link";
+import { useLanguage } from "./LanguageProvider";
 
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="footer">
       <div>
         <strong>Tessa Shop</strong>
-        <p>Portal PWA B2B para compra y cotización de flores ecuatorianas premium.</p>
+        <p>{t("footerText")}</p>
       </div>
       <div className="footer-links">
-        <Link href="/catalogo">Catálogo</Link>
-        <Link href="/acceso">Solicitar acceso</Link>
-        <Link href="/cotizacion">Ver cotización</Link>
+        <Link href="/catalogo">{t("navCatalog")}</Link>
+        <Link href="/acceso">{t("footerAccess")}</Link>
+        <Link href="/cotizacion">{t("footerQuote")}</Link>
       </div>
     </footer>
   );

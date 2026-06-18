@@ -1,56 +1,63 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { categories, colors, products } from "@/lib/products";
+import { products } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
+import { useLanguage } from "./LanguageProvider";
 
 export function CatalogClient() {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("Todas");
-  const [color, setColor] = useState("Todos");
+  const [category, setCategory] = useState("__all");
+  const [color, setColor] = useState("__all");
+  const { l, t } = useLanguage();
+
+  const categories = useMemo(() => Array.from(new Set(products.map((product) => l(product.category)))).sort(), [l]);
+  const colors = useMemo(() => Array.from(new Set(products.map((product) => l(product.color)))).sort(), [l]);
 
   const filtered = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return products.filter((product) => {
+      const productCategory = l(product.category);
+      const productColor = l(product.color);
       const matchesQuery =
         !normalizedQuery ||
-        [product.name, product.description, product.category, product.color, product.tags.join(" ")]
+        [product.name, l(product.description), productCategory, productColor, product.tags.map((tag) => l(tag)).join(" ")]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery);
-      const matchesCategory = category === "Todas" || product.category === category;
-      const matchesColor = color === "Todos" || product.color === color;
+      const matchesCategory = category === "__all" || productCategory === category;
+      const matchesColor = color === "__all" || productColor === color;
       return matchesQuery && matchesCategory && matchesColor;
     });
-  }, [query, category, color]);
+  }, [query, category, color, l]);
 
   return (
     <section className="catalog-section">
       <div className="filters-panel">
         <label>
-          Buscar
+          {t("search")}
           <input
             type="search"
-            placeholder="Freedom, bouquet, wedding..."
+            placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
         <label>
-          Categoría
+          {t("category")}
           <select value={category} onChange={(event) => setCategory(event.target.value)}>
-            <option>Todas</option>
+            <option value="__all">{t("allCategories")}</option>
             {categories.map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>{item}</option>
             ))}
           </select>
         </label>
         <label>
-          Color
+          {t("color")}
           <select value={color} onChange={(event) => setColor(event.target.value)}>
-            <option>Todos</option>
+            <option value="__all">{t("allColors")}</option>
             {colors.map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>{item}</option>
             ))}
           </select>
         </label>
@@ -58,7 +65,7 @@ export function CatalogClient() {
 
       <div className="catalog-summary">
         <p>
-          <strong>{filtered.length}</strong> productos disponibles para explorar. Los precios finales se muestran solo a clientes aprobados.
+          <strong>{filtered.length}</strong> {t("catalogSummary")}
         </p>
       </div>
 

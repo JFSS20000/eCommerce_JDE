@@ -1,5 +1,14 @@
-const CACHE_NAME = "tessa-shop-pwa-v1";
-const APP_SHELL = ["/", "/catalogo", "/cotizacion", "/acceso", "/manifest.webmanifest"];
+const CACHE_NAME = "tessa-shop-pwa-v2";
+const APP_SHELL = [
+  "/",
+  "/catalogo",
+  "/cotizacion",
+  "/seguimiento",
+  "/compras",
+  "/acceso",
+  "/admin",
+  "/manifest.webmanifest"
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -15,6 +24,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (event.request.url.includes("/api/")) return;
 
   event.respondWith(
     fetch(event.request)

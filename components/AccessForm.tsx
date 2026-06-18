@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useLanguage } from "./LanguageProvider";
 
 export function AccessForm() {
   const [sent, setSent] = useState(false);
+  const { t } = useLanguage();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,7 +30,7 @@ export function AccessForm() {
         <input required placeholder="Fernando Sarmiento" />
       </label>
       <label>
-        Empresa
+        {t("company")}
         <input required placeholder="Nombre de empresa" />
       </label>
       <label>
@@ -40,7 +42,7 @@ export function AccessForm() {
         <input required placeholder="+593..." />
       </label>
       <label>
-        País destino
+        {t("destinationCountry")}
         <input required placeholder="Estados Unidos, España, Chile..." />
       </label>
       <label>
@@ -66,7 +68,7 @@ export function AccessForm() {
         </select>
       </label>
       <label className="full-field">
-        Mensaje
+        {t("notes")}
         <textarea placeholder="Cuéntanos qué variedades, colores o temporadas te interesan." />
       </label>
       <button type="submit" className="button full-field">Enviar solicitud de acceso</button>

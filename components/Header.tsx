@@ -1,33 +1,44 @@
+"use client";
+
 import Link from "next/link";
 import { FloatingQuote } from "./FloatingQuote";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useLanguage } from "./LanguageProvider";
 
 const navigation = [
-  { href: "/catalogo", label: "Catálogo" },
-  { href: "/cotizacion", label: "Cotización" },
-  { href: "/acceso", label: "Acceso B2B" },
-  { href: "/admin", label: "Admin demo" }
-];
+  { href: "/catalogo", key: "navCatalog" },
+  { href: "/cotizacion", key: "navQuote" },
+  { href: "/seguimiento", key: "navTracking" },
+  { href: "/compras", key: "navPurchases" },
+  { href: "/acceso", key: "navAccess" },
+  { href: "/admin", key: "navAdmin" }
+] as const;
 
 export function Header() {
+  const { t } = useLanguage();
+
   return (
     <header className="site-header">
       <Link href="/" className="brand" aria-label="Tessa Shop inicio">
         <span className="brand-mark">T</span>
         <span>
           <strong>Tessa Shop</strong>
-          <small>Floral B2B Ecuador</small>
+          <small>{t("brandLine")}</small>
         </span>
       </Link>
 
       <nav className="nav" aria-label="Navegación principal">
         {navigation.map((item) => (
           <Link key={item.href} href={item.href}>
-            {item.label}
+            {t(item.key)}
           </Link>
         ))}
       </nav>
 
-      <FloatingQuote />
+      <div className="header-actions">
+        <LanguageSwitcher />
+        <FloatingQuote />
+      </div>
     </header>
   );
 }

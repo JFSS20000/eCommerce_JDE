@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Product } from "@/lib/products";
+import { useLanguage } from "./LanguageProvider";
 
 type QuoteItem = {
   slug: string;
@@ -9,13 +10,16 @@ type QuoteItem = {
   category: string;
   color: string;
   image: string;
+  sourceUrl: string;
   quantity: number;
   stemLength: string;
   packing: string;
+  jdeItemNumber: string;
 };
 
 export function QuoteButton({ product, compact = false }: { product: Product; compact?: boolean }) {
   const [added, setAdded] = useState(false);
+  const { l, t } = useLanguage();
 
   function addToQuote() {
     const current = window.localStorage.getItem("tessa_quote");
@@ -28,12 +32,14 @@ export function QuoteButton({ product, compact = false }: { product: Product; co
       items.push({
         slug: product.slug,
         name: product.name,
-        category: product.category,
-        color: product.color,
+        category: l(product.category),
+        color: l(product.color),
         image: product.image,
+        sourceUrl: product.sourceUrl,
         quantity: 1,
         stemLength: product.stemLengths[0],
-        packing: product.packing
+        packing: product.packing,
+        jdeItemNumber: product.jdeItemNumber
       });
     }
 
@@ -45,7 +51,7 @@ export function QuoteButton({ product, compact = false }: { product: Product; co
 
   return (
     <button className={compact ? "button small" : "button"} onClick={addToQuote} type="button">
-      {added ? "Agregado" : "Agregar a cotización"}
+      {added ? t("added") : t("addToQuote")}
     </button>
   );
 }

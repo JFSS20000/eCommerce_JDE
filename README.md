@@ -1,35 +1,33 @@
 # Tessa Shop PWA
 
-PWA eCommerce B2B para Tessa Ecuador, inspirada en el flujo de catálogo, listas y recompra rápida de un portal profesional, pero adaptada al negocio floral.
+PWA eCommerce B2B para Tessa Ecuador, inspirada en un portal profesional de catálogo, listas, recompra y cotización, pero adaptada al negocio floral y preparada para publicar en Vercel.
 
-## Qué incluye
+## Novedades de esta versión
 
-- Next.js App Router
-- Diseño responsive listo para móvil y escritorio
-- PWA instalable con `manifest.webmanifest` y `sw.js`
-- Home comercial B2B
-- Catálogo floral con búsqueda y filtros
-- Fichas de producto
-- Carrito de cotización en `localStorage`
-- Formulario de solicitud de acceso B2B
-- Pantalla de admin demo para explicar módulos futuros
-- Assets SVG propios para productos de demostración
-- Configuración base para Vercel
+- Cambio de idioma desde la interfaz: Español, Inglés y Ruso.
+- `Admin demo` funcional con pestañas, configuración local y bitácora.
+- Configuración para conexión con JD Edwards EnterpriseOne AIS Server.
+- API serverless `/api/jde/ais-test` para probar conexión AIS desde Vercel.
+- API serverless `/api/tessa-image` para obtener imágenes desde páginas públicas de producto de Tessa.
+- Página de seguimiento de cotizaciones y pedidos: `/seguimiento`.
+- Página de compras pasadas y repetición de pedidos: `/compras`.
+- Catálogo actualizado con productos reales de la tienda pública de Tessa y `sourceUrl` por flor.
+- Cotizaciones generadas en localStorage con código tipo `Q-2026-1234`.
+- Historial demo de pedidos y compras pasadas.
 
-## Estructura principal
+## Rutas principales
 
 ```txt
-app/
-  page.tsx                 Home
-  catalogo/page.tsx        Catálogo B2B
-  producto/[slug]/page.tsx Ficha de producto
-  cotizacion/page.tsx      Carrito de cotización
-  acceso/page.tsx          Solicitud de acceso B2B
-  admin/page.tsx           Admin demo
-components/                Componentes UI
-lib/products.ts            Catálogo demo
-public/                    Manifest, service worker, íconos y productos SVG
-vercel.json                Headers para PWA
+/                         Home B2B
+/catalogo                 Catálogo floral
+/producto/[slug]          Ficha de flor
+/cotizacion               Carrito y solicitud B2B
+/seguimiento              Seguimiento de cotización o pedido
+/compras                  Compras pasadas y repetir pedido
+/acceso                   Solicitud de acceso B2B
+/admin                    Admin demo + JD Edwards AIS
+/api/tessa-image          Proxy de imagen pública desde Tessa Shop
+/api/jde/ais-test         Prueba serverless de conexión AIS
 ```
 
 ## Ejecutar localmente
@@ -45,61 +43,64 @@ Abrir:
 http://localhost:3000
 ```
 
-## Publicar en Vercel
+## Publicar en Vercel desde GitHub
 
-### Opción 1: desde GitHub
-
-1. Sube este proyecto a un repositorio de GitHub.
+1. Sube el contenido del proyecto al repositorio.
 2. Entra a Vercel.
 3. Crea un nuevo proyecto.
-4. Importa el repositorio.
-5. Vercel detectará Next.js automáticamente.
-6. Usa estos comandos:
-   - Install Command: `npm install`
-   - Build Command: `npm run build`
-   - Output Directory: dejar vacío
-7. Publica.
+4. Importa el repositorio de GitHub.
+5. Framework Preset: `Next.js`.
+6. Build Command: `npm run build`.
+7. Output Directory: dejar vacío.
+8. Deploy.
 
-### Opción 2: con Vercel CLI
+## Variables de entorno para JD Edwards AIS
 
-```bash
-npm install
-npm run build
-npx vercel
-```
-
-Para producción:
-
-```bash
-npx vercel --prod
-```
-
-## Próximas integraciones recomendadas
-
-Este MVP es visual y funcional en frontend. Para producción se recomienda agregar:
-
-- Autenticación real para clientes B2B
-- Base de datos PostgreSQL
-- Panel admin real para productos, clientes y precios
-- Email transaccional para solicitudes de cotización
-- CRM o ERP para disponibilidad y pedidos
-- Listas de precios por cliente o segmento
-- Notificaciones push PWA
-- Formularios conectados a backend o Vercel Functions
-
-## Variables de entorno futuras
-
-Cuando se conecte backend, se podrían usar variables como:
+Configura estas variables en Vercel en **Project Settings > Environment Variables**:
 
 ```env
-DATABASE_URL=
-NEXT_PUBLIC_SITE_URL=
-SMTP_HOST=
-SMTP_USER=
-SMTP_PASSWORD=
-CRM_API_KEY=
+JDE_AIS_BASE_URL=https://ais.example.com
+JDE_AIS_ENVIRONMENT=JPS920
+JDE_AIS_ROLE=*ALL
+JDE_AIS_USERNAME=
+JDE_AIS_PASSWORD=
+JDE_ORCH_PRODUCTS=ORCH_TESSA_PRODUCTS
+JDE_ORCH_INVENTORY=ORCH_TESSA_INVENTORY
+JDE_ORCH_QUOTE=ORCH_TESSA_QUOTE_CREATE
+JDE_ORCH_ORDER_STATUS=ORCH_TESSA_ORDER_STATUS
 ```
+
+El admin demo permite guardar parámetros en `localStorage` para la demostración. Para producción, las credenciales reales deben vivir en variables de entorno de Vercel, no en el navegador.
+
+## Flujo JD Edwards AIS sugerido
+
+- Productos: catálogo Tessa → `ORCH_TESSA_PRODUCTS`.
+- Inventario/disponibilidad: stock por variedad/largo/empaque → `ORCH_TESSA_INVENTORY`.
+- Cotización: carrito B2B → `ORCH_TESSA_QUOTE_CREATE`.
+- Pedido: seguimiento y estado logístico → `ORCH_TESSA_ORDER_STATUS`.
+
+La ruta `/api/jde/ais-test` intenta consultar:
+
+- `/jderest/tokenrequest` si hay usuario y contraseña.
+- `/jderest/defaultconfig` si solo se configura la URL base.
+
+## Imágenes desde Tessa Shop
+
+Cada producto tiene un `sourceUrl` hacia su página pública en `https://tessacorporation.com/product/...`. El componente `ProductImage` llama a `/api/tessa-image`, que intenta leer la imagen pública desde la página de Tessa y la cachea en el navegador. Si la imagen no se puede obtener, se usa un SVG fallback local para que la PWA nunca quede rota.
+
+## Códigos demo para seguimiento
+
+Puedes probar:
+
+```txt
+Q-2026-0048
+Q-2026-0052
+P-2026-0091
+P-2026-0087
+```
+
+Las nuevas cotizaciones creadas desde `/cotizacion` también generan códigos de seguimiento y se guardan en `localStorage`.
 
 ## Nota de alcance
 
-Este proyecto deja preparada la experiencia recomendada para una primera publicación en Vercel. El envío de formularios está simulado; para producción se debe conectar a un backend, CRM, correo o endpoint serverless.
+Este proyecto es un MVP publicable y navegable en Vercel. La autenticación, precios reales, inventario real, persistencia de base de datos y ejecución final de orquestaciones JDE deben conectarse en la siguiente fase.

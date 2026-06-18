@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLanguage } from "./LanguageProvider";
 
 export function FloatingQuote() {
   const [count, setCount] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const update = () => {
@@ -27,8 +29,8 @@ export function FloatingQuote() {
   }, []);
 
   return (
-    <Link href="/cotizacion" className="quote-pill" aria-label={`Cotización con ${count} productos`}>
-      <span>Cotización</span>
+    <Link href="/cotizacion" className="quote-pill" aria-label={`${t("quotePill")} ${count}`}>
+      <span>{t("quotePill")}</span>
       <strong>{count}</strong>
     </Link>
   );
