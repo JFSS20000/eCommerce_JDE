@@ -104,3 +104,26 @@ Las nuevas cotizaciones creadas desde `/cotizacion` también generan códigos de
 ## Nota de alcance
 
 Este proyecto es un MVP publicable y navegable en Vercel. La autenticación, precios reales, inventario real, persistencia de base de datos y ejecución final de orquestaciones JDE deben conectarse en la siguiente fase.
+
+- Footer eCommerce actualizado con navegación B2B, soporte, cuenta, bloque JDE/AIS, newsletter y enlace para volver arriba.
+
+## Configuración de colores
+
+La PWA incluye un configurador visual de colores en `Admin demo > Colores`.
+
+Funciones incluidas:
+
+- Presets: Tessa clásico, Premium oscuro, Rose export y Clean B2B.
+- Edición de tokens de marca: primario, títulos, acento, fondos, textos y footer.
+- Vista previa en tiempo real.
+- Persistencia demo en `localStorage`.
+- Restauración del tema Tessa clásico.
+
+Archivos principales:
+
+- `lib/theme.ts`: tokens, presets y funciones de aplicar/guardar/restaurar tema.
+- `components/ThemeProvider.tsx`: carga el tema guardado al abrir la PWA.
+- `components/AdminDemo.tsx`: pestaña visual para configurar colores.
+- `app/globals.css`: variables CSS usadas por toda la interfaz.
+
+En producción, si se desea que la configuración sea global para todos los usuarios, conectar estos tokens a una tabla/configuración en base de datos o a una orquestación AIS/JDE administrada desde backend.

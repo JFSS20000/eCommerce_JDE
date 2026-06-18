@@ -18,7 +18,7 @@ export function Header() {
   const { t } = useLanguage();
 
   return (
-    <header className="site-header">
+    <header id="top" className="site-header">
       <Link href="/" className="brand" aria-label="Tessa Shop inicio">
         <span className="brand-mark">T</span>
         <span>

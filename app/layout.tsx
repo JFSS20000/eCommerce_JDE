@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { PwaRegistration } from "@/components/PwaRegistration";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Tessa Shop | Floral B2B Ecuador",
@@ -28,9 +29,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <PwaRegistration />
         <LanguageProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <ThemeProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </ThemeProvider>
         </LanguageProvider>
       </body>
     </html>

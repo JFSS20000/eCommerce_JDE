@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { products } from "@/lib/products";
 import { trackingRecords, purchases } from "@/lib/demo-data";
+import { applyTheme, defaultTheme, loadStoredTheme, resetTheme, saveTheme, themeFields, themePresets, type ThemeConfig } from "@/lib/theme";
 
 type AisConfig = {
   baseUrl: string;
@@ -47,15 +48,20 @@ const modules = [
 export function AdminDemo() {
   const [config, setConfig] = useState<AisConfig>(defaultConfig);
   const [logs, setLogs] = useState<SyncLog[]>([]);
-  const [activeTab, setActiveTab] = useState<"overview" | "ais" | "sync">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "ais" | "sync" | "colors">("overview");
   const [testResult, setTestResult] = useState<string>("");
   const [testing, setTesting] = useState(false);
+  const [theme, setTheme] = useState<ThemeConfig>(defaultTheme);
+  const [activePreset, setActivePreset] = useState("tessa-classic");
 
   useEffect(() => {
     const storedConfig = window.localStorage.getItem("tessa_ais_config");
     const storedLogs = window.localStorage.getItem("tessa_sync_logs");
     if (storedConfig) setConfig(JSON.parse(storedConfig));
     if (storedLogs) setLogs(JSON.parse(storedLogs));
+    const storedTheme = loadStoredTheme();
+    setTheme(storedTheme);
+    applyTheme(storedTheme);
   }, []);
 
   const envPreview = useMemo(() => {
@@ -74,6 +80,34 @@ export function AdminDemo() {
 
   function updateField(field: keyof AisConfig, value: string) {
     setConfig((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateThemeField(field: keyof ThemeConfig, value: string) {
+    const nextTheme = { ...theme, [field]: value };
+    setTheme(nextTheme);
+    setActivePreset("custom");
+    applyTheme(nextTheme);
+  }
+
+  function applyPreset(presetId: string) {
+    const preset = themePresets.find((item) => item.id === presetId);
+    if (!preset) return;
+    setTheme(preset.colors);
+    setActivePreset(preset.id);
+    saveTheme(preset.colors);
+    addLog("Preset de colores aplicado", preset.name);
+  }
+
+  function saveColorConfig() {
+    saveTheme(theme);
+    addLog("Configuración de colores guardada", "El tema quedó almacenado en localStorage y se aplicará al cargar la PWA.");
+  }
+
+  function restoreColorConfig() {
+    resetTheme();
+    setTheme(defaultTheme);
+    setActivePreset("tessa-classic");
+    addLog("Colores restaurados", "Se restauró el tema Tessa clásico.");
   }
 
   function saveConfig() {
@@ -131,6 +165,7 @@ export function AdminDemo() {
         <button className={activeTab === "overview" ? "active" : ""} onClick={() => setActiveTab("overview")} type="button">Resumen</button>
         <button className={activeTab === "ais" ? "active" : ""} onClick={() => setActiveTab("ais")} type="button">JD Edwards AIS</button>
         <button className={activeTab === "sync" ? "active" : ""} onClick={() => setActiveTab("sync")} type="button">Sincronización</button>
+        <button className={activeTab === "colors" ? "active" : ""} onClick={() => setActiveTab("colors")} type="button">Colores</button>
       </div>
 
       {activeTab === "overview" && (
@@ -203,6 +238,98 @@ export function AdminDemo() {
             <pre>{envPreview}</pre>
             <p>Para producción, no guardes credenciales en el navegador. Configura estas variables en Vercel y deja el formulario solo para parámetros no sensibles.</p>
           </article>
+        </div>
+      )}
+
+
+
+      {activeTab === "colors" && (
+        <div className="color-config-panel">
+          <section className="admin-card">
+            <span>Brand theme</span>
+            <h2>Configuración de colores</h2>
+            <p>Personaliza la identidad visual del eCommerce: marca, fondos, botones, textos y footer. Los cambios se previsualizan al instante y se guardan localmente para demo.</p>
+
+            <div className="theme-preset-grid">
+              {themePresets.map((preset) => (
+                <button
+                  key={preset.id}
+                  className={`theme-preset-card ${activePreset === preset.id ? "active" : ""}`}
+                  onClick={() => applyPreset(preset.id)}
+                  type="button"
+                >
+                  <div className="theme-swatches" aria-hidden="true">
+                    <span style={{ background: preset.colors.forest }} />
+                    <span style={{ background: preset.colors.rose }} />
+                    <span style={{ background: preset.colors.cream }} />
+                    <span style={{ background: preset.colors.footerBg }} />
+                  </div>
+                  <strong>{preset.name}</strong>
+                  <p>{preset.description}</p>
+                </button>
+              ))}
+            </div>
+
+            <div className="color-field-grid">
+              {themeFields.map((field) => (
+                <label key={field.key} className="color-field">
+                  <span>{field.label}</span>
+                  <div className="color-input-row">
+                    <input
+                      type="color"
+                      value={theme[field.key].startsWith("#") ? theme[field.key] : defaultTheme[field.key]}
+                      onChange={(event) => updateThemeField(field.key, event.target.value)}
+                    />
+                    <input
+                      value={theme[field.key]}
+                      onChange={(event) => updateThemeField(field.key, event.target.value)}
+                      placeholder={field.group}
+                    />
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="admin-actions wrap">
+              <button className="button" type="button" onClick={saveColorConfig}>Guardar colores</button>
+              <button className="ghost-button" type="button" onClick={restoreColorConfig}>Restaurar Tessa clásico</button>
+            </div>
+          </section>
+
+          <aside className="theme-preview">
+            <article className="theme-preview-card">
+              <div className="theme-preview-hero">
+                <span>Vista previa</span>
+                <h3>Tessa Shop B2B</h3>
+                <p>Catálogo floral, cotización y seguimiento.</p>
+              </div>
+              <div className="theme-preview-body">
+                <p className="eyebrow">Premium Ecuador</p>
+                <h3>Freedom Rose</h3>
+                <p>Producto demo con botón principal y fondo suave.</p>
+                <button className="button small" type="button">Agregar a cotización</button>
+              </div>
+              <div className="theme-preview-footer">
+                <strong>Footer eCommerce</strong>
+                <br />
+                <small>Soporte, JDE AIS y compras pasadas.</small>
+              </div>
+            </article>
+
+            <article className="admin-card">
+              <span>Tokens</span>
+              <h2>Colores activos</h2>
+              <div className="theme-token-table">
+                {themeFields.slice(0, 8).map((field) => (
+                  <div key={field.key} className="theme-token-row">
+                    <i style={{ background: theme[field.key] }} />
+                    <span>{field.label}</span>
+                    <code>{theme[field.key]}</code>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </aside>
         </div>
       )}
 
